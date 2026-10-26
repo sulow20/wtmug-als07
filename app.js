@@ -17,6 +17,8 @@
     current: null
   };
 
+  // Test plakalarında kullanılan renkler sabit HEX değerleridir.
+  // Arayüzün açık/koyu temasına bağlı değildir.
   const PALETTES = {
     redGreen: {
       name: "Kırmızı-yeşil renk grubu",
@@ -47,7 +49,7 @@
   const pick = (items) =>
     items[randInt(0, items.length - 1)];
 
-  const shuffle = (items) => {
+  function shuffle(items) {
     const result = [...items];
 
     for (let i = result.length - 1; i > 0; i--) {
@@ -56,7 +58,7 @@
     }
 
     return result;
-  };
+  }
 
   function showScreen(name) {
     Object.values(screens).forEach((screen) => {
@@ -64,7 +66,7 @@
     });
 
     screens[name].classList.remove("hidden");
-    window.scrollTo({ top: 0, behavior: "instant" });
+    window.scrollTo(0, 0);
   }
 
   function makeQuestions() {
@@ -119,7 +121,6 @@
   }
 
   function randomPointInPlate() {
-    // Daire dışına düşen noktaları ele.
     for (let tries = 0; tries < 100; tries++) {
       const x = rand(20, 380);
       const y = rand(20, 380);
@@ -129,12 +130,17 @@
       }
     }
 
-    return { x: rand(30, 370), y: rand(30, 370) };
+    return { x: 200, y: 200 };
   }
 
   function createDot(x, y, color, radius, extra = "") {
-    return `<circle cx="${x.toFixed(2)}" cy="${y.toFixed(2)}"
-      r="${radius.toFixed(2)}" fill="${escapeXml(color)}" ${extra}/>`;
+    return `<circle
+      cx="${x.toFixed(2)}"
+      cy="${y.toFixed(2)}"
+      r="${radius.toFixed(2)}"
+      fill="${escapeXml(color)}"
+      ${extra}
+    />`;
   }
 
   function generatePlate(question) {
@@ -142,26 +148,21 @@
     const target = question.target;
     const dots = [];
 
-    // Ana plakanın arka plan noktaları.
+    // Arka plan noktaları.
     for (let i = 0; i < 480; i++) {
       const point = randomPointInPlate();
-
-      let color = pick(palette.background);
-
-      // Nokta büyüklükleri, renkleri ve konumları rastgeledir.
-      const radius = rand(3.2, 8.2);
 
       dots.push(createDot(
         point.x,
         point.y,
-        color,
-        radius,
+        pick(palette.background),
+        rand(3.2, 8.2),
         `opacity="${rand(0.76, 1).toFixed(2)}"`
       ));
     }
 
     if (question.mode === "tap") {
-      // Farklı renkteki alanın içine nokta örüntüsü yerleştir.
+      // Dokunma sorusunda farklı renkli alan oluştur.
       for (let i = 0; i < 170; i++) {
         let x;
         let y;
@@ -185,8 +186,7 @@
         ));
       }
     } else {
-      // Rakamları yedi parçalı bir fontla değil, noktalardan üret.
-      // Her rakamın çizgileri boyunca nokta örneklenir.
+      // Sayı, SVG yazısı yerine noktalardan oluşturulur.
       const digitSegments = {
         0: ["a", "b", "c", "d", "e", "f"],
         1: ["b", "c"],
@@ -222,13 +222,12 @@
 
       [...text].forEach((character, digitIndex) => {
         const digit = Number(character);
-        const selected = digitSegments[digit];
         const offsetX = startX + digitIndex * (digitWidth + digitGap);
 
-        selected.forEach((segmentName) => {
+        digitSegments[digit].forEach((segmentName) => {
           const [x1, y1, x2, y2] = segments[segmentName];
           const length = distance(x1, y1, x2, y2);
-          const steps = Math.ceil(length / 7);
+          const steps = Math.max(1, Math.ceil(length / 7));
 
           for (let step = 0; step <= steps; step++) {
             const t = step / steps;
@@ -241,7 +240,7 @@
                 x + rand(-2, 2),
                 y + rand(-2, 2),
                 pick(palette.foreground),
-                rand(2.5, 5.0)
+                rand(2.5, 5)
               ));
             }
           }
@@ -249,18 +248,24 @@
       });
     }
 
-    // SVG her çağrıldığında yeniden üretilir.
+    // Tema dönüşümünü azaltmak için SVG'nin renk şeması sabitlenir.
+    // SVG her soru için yeniden oluşturulur; statik görsel kullanılmaz.
     return `
-      <svg viewBox="0 0 400 400"
-           xmlns="http://www.w3.org/2000/svg"
-           role="img"
-           aria-label="Rastgele renkli noktalardan oluşan test plakası">
+      <svg
+        viewBox="0 0 400 400"
+        xmlns="http://www.w3.org/2000/svg"
+        role="img"
+        aria-label="Rastgele renkli nokta plakası"
+        style="color-scheme: only light; forced-color-adjust: none;"
+      >
         <defs>
           <clipPath id="plateClip">
             <circle cx="200" cy="200" r="180"/>
           </clipPath>
         </defs>
+
         <circle cx="200" cy="200" r="182" fill="#252b31"/>
+
         <g clip-path="url(#plateClip)">
           ${dots.join("")}
         </g>
@@ -305,11 +310,18 @@
 
     $("plate").innerHTML = generatePlate(question);
 
-    $("tapArea").classList.toggle("hidden", question.mode !== "tap");
-    $("numberForm").classList.toggle("hidden", question.mode !== "number");
+    $("tapArea").classList.toggle(
+      "hidden",
+      question.mode !== "tap"
+    );
+
+    $("numberForm").classList.toggle(
+      "hidden",
+      question.mode !== "number"
+    );
+
     $("nextBtn").classList.add("hidden");
     $("feedback").textContent = "";
-
     $("numberInput").value = "";
     $("numberInput").disabled = false;
 
@@ -331,8 +343,7 @@
       response,
       expected: state.current.mode === "number"
         ? state.current.number
-        : "Farklı alan",
-      elapsed: null
+        : "Farklı alan"
     });
 
     $("feedback").textContent = correct
@@ -340,8 +351,11 @@
       : "Yanıt kaydedildi. Bu aşamada farklı bir yanıt verildi.";
 
     $("numberInput").disabled = true;
+
     $("nextBtn").textContent =
-      state.index === 9 ? "Sonuçları Gör" : "Sonraki Aşama";
+      state.index === 9
+        ? "Sonuçları Gör"
+        : "Sonraki Aşama";
 
     $("nextBtn").classList.remove("hidden");
   }
@@ -378,7 +392,9 @@
   function handleNumberSubmit(event) {
     event.preventDefault();
 
-    if (state.locked || state.current.mode !== "number") return;
+    if (state.locked || state.current.mode !== "number") {
+      return;
+    }
 
     const raw = $("numberInput").value.trim();
 
@@ -410,14 +426,21 @@
           <span>${title}</span>
           <span>${correct}/${total} doğru</span>
         </div>
-        <div class="progress-track"
-             role="progressbar"
-             aria-label="${title}"
-             aria-valuemin="0"
-             aria-valuemax="100"
-             aria-valuenow="${percent}">
-          <div class="progress-bar" style="width:${percent}%"></div>
+
+        <div
+          class="progress-track"
+          role="progressbar"
+          aria-label="${title}"
+          aria-valuemin="0"
+          aria-valuemax="100"
+          aria-valuenow="${percent}"
+        >
+          <div
+            class="progress-bar"
+            style="width:${percent}%"
+          ></div>
         </div>
+
         <p>${description}</p>
       </div>
     `;
@@ -427,15 +450,23 @@
     const total = state.answers.length;
     const correct = state.answers.filter((a) => a.correct).length;
     const wrong = total - correct;
-    const percent = total ? Math.round((correct / total) * 100) : 0;
+    const percent = total
+      ? Math.round((correct / total) * 100)
+      : 0;
 
     $("scoreText").textContent = `${percent}%`;
     $("scoreBar").style.width = `${percent}%`;
+
     $("scoreSummary").textContent =
       `${total} yanıt değerlendirildi; ${correct} doğru, ${wrong} hatalı yanıt.`;
 
-    const tapAnswers = state.answers.filter((a) => a.mode === "tap");
-    const numberAnswers = state.answers.filter((a) => a.mode === "number");
+    const tapAnswers = state.answers.filter(
+      (a) => a.mode === "tap"
+    );
+
+    const numberAnswers = state.answers.filter(
+      (a) => a.mode === "number"
+    );
 
     $("metricList").innerHTML =
       metricCard(
@@ -463,17 +494,23 @@
       achromatic: "Renk doygunluğu paleti"
     };
 
-    $("typeResults").innerHTML = Object.keys(PALETTES).map((key) => {
-      const group = state.answers.filter((a) => a.palette === key);
-      const groupCorrect = group.filter((a) => a.correct).length;
+    $("typeResults").innerHTML =
+      Object.keys(PALETTES).map((key) => {
+        const group = state.answers.filter(
+          (a) => a.palette === key
+        );
 
-      return metricCard(
-        labels[key],
-        groupCorrect,
-        group.length,
-        "Bu paletle oluşturulan sorulardaki yanıt özeti. Tek başına tanı anlamına gelmez."
-      );
-    }).join("");
+        const groupCorrect = group.filter(
+          (a) => a.correct
+        ).length;
+
+        return metricCard(
+          labels[key],
+          groupCorrect,
+          group.length,
+          "Bu paletle oluşturulan sorulardaki yanıt özeti. Tek başına tanı anlamına gelmez."
+        );
+      }).join("");
 
     showScreen("result");
   }
@@ -490,9 +527,7 @@
   }
 
   $("startBtn").addEventListener("click", startTest);
-
   $("plate").addEventListener("click", handlePlateClick);
-
   $("numberForm").addEventListener("submit", handleNumberSubmit);
 
   $("nextBtn").addEventListener("click", () => {
@@ -518,8 +553,7 @@
 
   $("restartBtn").addEventListener("click", startTest);
 
-  // Mobil tarayıcılarda çoklu dokunmayla yakınlaştırmayı sınırlama.
-  // Tarayıcı ve işletim sistemi bazı hareketleri yine de kontrol edebilir.
+  // Çoklu dokunmayla yakınlaştırmayı sınırlama.
   document.addEventListener("touchmove", (event) => {
     if (event.touches && event.touches.length > 1) {
       event.preventDefault();
@@ -530,12 +564,15 @@
     event.preventDefault();
   }, { passive: false });
 
-  // Uygulamayı çevrimdışı kullanılmak üzere kaydet.
+  // PWA çevrimdışı desteği.
   if ("serviceWorker" in navigator && location.protocol !== "file:") {
     window.addEventListener("load", () => {
       navigator.serviceWorker.register("./sw.js")
         .catch((error) => {
-          console.error("Service Worker kaydedilemedi:", error);
+          console.error(
+            "Service Worker kaydedilemedi:",
+            error
+          );
         });
     });
   }
