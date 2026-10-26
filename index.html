@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#101827">
+  <meta name="description" content="Dinamik renk görme ön tarama uygulaması.">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+  <title>Renk Körlüğü Testi</title>
+
+  <link rel="manifest" href="./manifest.json">
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+  <main class="app">
+    <header class="topbar">
+      <div class="brand">RENK TESTİ</div>
+      <div class="top-caption">10 AŞAMALI ÖN TARAMA</div>
+    </header>
+
+    <section id="welcome" class="panel">
+      <p class="eyebrow">RENK GÖRME DEĞERLENDİRMESİ</p>
+      <h1>Renkleri nasıl görüyorsun?</h1>
+      <p class="muted">
+        Farklı renklerde oluşturulan nokta plakalarıyla 10 aşamalı
+        bir ön tarama gerçekleştir.
+      </p>
+
+      <div class="info-grid">
+        <div class="info-card">
+          <strong>10</strong>
+          <span>Aşama</span>
+        </div>
+        <div class="info-card">
+          <strong>5 + 5</strong>
+          <span>İki soru türü</span>
+        </div>
+        <div class="info-card">
+          <strong>Ücretsiz</strong>
+          <span>Çevrimdışı kullanım</span>
+        </div>
+      </div>
+
+      <div class="notice">
+        Bu uygulama tıbbi tanı koymaz. Ekran özellikleri, parlaklık
+        ve görüntüleme koşulları sonucu etkileyebilir.
+      </div>
+
+      <button id="startBtn" class="primary-btn">
+        Teste Başla
+      </button>
+    </section>
+
+    <section id="testScreen" class="panel hidden">
+      <div class="progress-heading">
+        <span id="stageLabel">Aşama 1 / 10</span>
+        <span id="progressPercent">10%</span>
+      </div>
+
+      <div
+        class="progress-track"
+        role="progressbar"
+        aria-label="Test ilerlemesi"
+        aria-valuemin="0"
+        aria-valuemax="10"
+        aria-valuenow="0"
+        id="progressTrack"
+      >
+        <div id="progressBar" class="progress-bar"></div>
+      </div>
+
+      <p id="questionType" class="eyebrow"></p>
+      <h2 id="questionTitle">Plakayı incele</h2>
+      <p id="questionDescription" class="muted"></p>
+
+      <div id="plateFrame" class="plate-frame">
+        <div id="plate" aria-label="Dinamik renkli nokta plakası"></div>
+      </div>
+
+      <div id="tapArea" class="answer-area hidden">
+        <p class="instruction">Farklı renkteki alanın üzerine dokun.</p>
+      </div>
+
+      <form id="numberForm" class="answer-area hidden">
+        <label for="numberInput">Gördüğün sayıyı yaz (1–99)</label>
+        <input
+          id="numberInput"
+          type="number"
+          inputmode="numeric"
+          min="1"
+          max="99"
+          step="1"
+          autocomplete="off"
+          placeholder="Örn. 42"
+          required
+        >
+        <button type="submit" class="primary-btn">Cevabı Gönder</button>
+      </form>
+
+      <p id="feedback" class="feedback" aria-live="polite"></p>
+
+      <button id="nextBtn" class="primary-btn hidden">
+        Sonraki Aşama
+      </button>
+
+      <button id="quitBtn" class="text-btn" type="button">
+        Testi Bitir
+      </button>
+    </section>
+
+    <section id="resultScreen" class="panel hidden">
+      <p class="eyebrow">TEST TAMAMLANDI</p>
+      <h1>Sonuçların</h1>
+
+      <div class="score-card">
+        <span class="muted">Genel başarı</span>
+        <strong id="scoreText">0%</strong>
+        <div class="progress-track">
+          <div id="scoreBar" class="progress-bar"></div>
+        </div>
+        <p id="scoreSummary" class="muted"></p>
+      </div>
+
+      <h2>Hata metrikleri</h2>
+      <div id="metricList" class="metric-list"></div>
+
+      <h2>Renk grubu değerlendirmesi</h2>
+      <div id="typeResults" class="metric-list"></div>
+
+      <div class="notice">
+        <strong>Tıbbi uyarı:</strong> Bu kısa, rastgele oluşturulmuş
+        tarama testi doğrulanmış bir Ishihara veya klinik renk görme
+        testi değildir. Sonuçlar tanı veya hastalık olasılığına ilişkin
+        doğrulanmış bir ölçüm olarak yorumlanmamalıdır. Şüphe varsa
+        göz hekimine başvur.
+      </div>
+
+      <button id="restartBtn" class="primary-btn">
+        Yeni Test Başlat
+      </button>
+    </section>
+
+    <footer class="footer">
+      <p>Renk Körlüğü Testi</p>
+      <p>Bilgilendirme ve ön tarama amacıyla hazırlanmıştır.</p>
+    </footer>
+  </main>
+
+  <script src="./app.js" defer></script>
+</body>
+</html>

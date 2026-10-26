@@ -1,0 +1,13 @@
+{
+  "id": "./",
+  "name": "Renk Körlüğü Testi",
+  "short_name": "Renk Testi",
+  "description": "Dinamik renk görme ön tarama uygulaması",
+  "lang": "tr",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#101827",
+  "theme_color": "#101827"
+}
