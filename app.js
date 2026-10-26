@@ -1,27 +1,4 @@
-Oturum aç
-Ücretsiz kaydol
 
-    Şunu dedin:
-
-    yaptığımız renk körü testini hatırılıyomusun
-    ChatGPT:
-
-    Şu an önceki yaptığımız renk körlüğü testinin detaylarını bu konuşmada göremiyorum, o yüzden tam olarak hatırlıyorum diyemem. 😅
-
-    Ama istersen kaldığımız yerden devam edebiliriz!
-
-    Bana küçük bir ipucu ver: Ishihara testi gibi, içinde renkli noktalarla sayıların gizlendiği bir test mi yapmıştık, yoksa sana renkler gösterip hangisi olduğunu mu sormuştum? 🎨
-    Şunu dedin:
-
-    sana sıra sıra kodları atayım
-    ChatGPT:
-
-    Tamamdır 😄🎨 Kodları bana sırayla at, ben de her birine tek tek bakayım.
-
-    Hepsini gönderirken sırayı koruyalım. Sonunda birlikte değerlendirelim.
-
-    İlk kodu gönder bakalım! 👀
-    Şunu dedin:
 
     "use strict";
 
