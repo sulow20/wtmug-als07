@@ -17,26 +17,51 @@
     current: null
   };
 
-  // Test plakalarında kullanılan renkler sabit HEX değerleridir.
-  // Arayüzün açık/koyu temasına bağlı değildir.
+  // Canlı ve doygun renkler.
   const PALETTES = {
     redGreen: {
       name: "Kırmızı-yeşil renk grubu",
-      background: ["#B5A46D", "#9B9165", "#C1B17D"],
-      foreground: ["#8B755A", "#7B6656", "#9C8061"],
-      target: ["#80634F", "#93745B"]
+      background: [
+        "#FF3B30", "#FF5A36", "#E92F48",
+        "#FF7043", "#F44336"
+      ],
+      foreground: [
+        "#00E676", "#39FF14", "#00C853",
+        "#76FF03", "#00FF87"
+      ],
+      target: [
+        "#00E676", "#39FF14", "#00C853", "#76FF03"
+      ]
     },
+
     blueYellow: {
       name: "Mavi-sarı renk grubu",
-      background: ["#9BAFBC", "#879FAA", "#B4C2C6"],
-      foreground: ["#B5A15B", "#9C8B4E", "#C5AC60"],
-      target: ["#C3A84D", "#AD984F"]
+      background: [
+        "#1769FF", "#2979FF", "#448AFF",
+        "#0057FF", "#304FFE"
+      ],
+      foreground: [
+        "#FFEA00", "#FFD600", "#FFAB00",
+        "#FFFF00", "#FFC400"
+      ],
+      target: [
+        "#FFEA00", "#FFD600", "#FFAB00", "#FFFF00"
+      ]
     },
+
     achromatic: {
       name: "Renk doygunluğu grubu",
-      background: ["#A4A4A4", "#929292", "#B7B7B7"],
-      foreground: ["#666666", "#777777", "#595959"],
-      target: ["#595959", "#6A6A6A"]
+      background: [
+        "#FFFFFF", "#E0E0E0", "#BDBDBD",
+        "#F5F5F5", "#D6D6D6"
+      ],
+      foreground: [
+        "#212121", "#424242", "#616161",
+        "#303030", "#000000"
+      ],
+      target: [
+        "#212121", "#424242", "#303030"
+      ]
     }
   };
 
@@ -122,8 +147,8 @@
 
   function randomPointInPlate() {
     for (let tries = 0; tries < 100; tries++) {
-      const x = rand(20, 380);
-      const y = rand(20, 380);
+      const x = rand(15, 385);
+      const y = rand(15, 385);
 
       if (distance(x, y, 200, 200) < 180) {
         return { x, y };
@@ -148,22 +173,22 @@
     const target = question.target;
     const dots = [];
 
-    // Arka plan noktaları.
-    for (let i = 0; i < 480; i++) {
+    // Beyaz plaka üzerinde canlı renkli arka plan noktaları.
+    for (let i = 0; i < 540; i++) {
       const point = randomPointInPlate();
 
       dots.push(createDot(
         point.x,
         point.y,
         pick(palette.background),
-        rand(3.2, 8.2),
-        `opacity="${rand(0.76, 1).toFixed(2)}"`
+        rand(3.5, 8),
+        `opacity="${rand(0.9, 1).toFixed(2)}"`
       ));
     }
 
     if (question.mode === "tap") {
-      // Dokunma sorusunda farklı renkli alan oluştur.
-      for (let i = 0; i < 170; i++) {
+      // Dokunma sorusu için farklı renkte bir alan.
+      for (let i = 0; i < 190; i++) {
         let x;
         let y;
 
@@ -182,11 +207,11 @@
           x,
           y,
           pick(palette.target),
-          rand(3.4, 7.2)
+          rand(3.5, 7.2)
         ));
       }
     } else {
-      // Sayı, SVG yazısı yerine noktalardan oluşturulur.
+      // Sayıyı SVG yazısı yerine renkli noktalardan oluştur.
       const digitSegments = {
         0: ["a", "b", "c", "d", "e", "f"],
         1: ["b", "c"],
@@ -213,6 +238,7 @@
       const text = String(question.number);
       const digitWidth = 34;
       const digitGap = 13;
+
       const totalWidth =
         text.length * digitWidth +
         (text.length - 1) * digitGap;
@@ -222,7 +248,9 @@
 
       [...text].forEach((character, digitIndex) => {
         const digit = Number(character);
-        const offsetX = startX + digitIndex * (digitWidth + digitGap);
+
+        const offsetX =
+          startX + digitIndex * (digitWidth + digitGap);
 
         digitSegments[digit].forEach((segmentName) => {
           const [x1, y1, x2, y2] = segments[segmentName];
@@ -232,8 +260,11 @@
           for (let step = 0; step <= steps; step++) {
             const t = step / steps;
 
-            const x = offsetX + x1 + (x2 - x1) * t + rand(-2.5, 2.5);
-            const y = startY + y1 + (y2 - y1) * t + rand(-2.5, 2.5);
+            const x =
+              offsetX + x1 + (x2 - x1) * t + rand(-2, 2);
+
+            const y =
+              startY + y1 + (y2 - y1) * t + rand(-2, 2);
 
             for (let repeat = 0; repeat < 2; repeat++) {
               dots.push(createDot(
@@ -248,14 +279,13 @@
       });
     }
 
-    // Tema dönüşümünü azaltmak için SVG'nin renk şeması sabitlenir.
-    // SVG her soru için yeniden oluşturulur; statik görsel kullanılmaz.
+    // Sabit beyaz zemin ve otomatik tema dönüşümüne karşı SVG ayarları.
     return `
       <svg
         viewBox="0 0 400 400"
         xmlns="http://www.w3.org/2000/svg"
         role="img"
-        aria-label="Rastgele renkli nokta plakası"
+        aria-label="Dinamik renkli nokta plakası"
         style="color-scheme: only light; forced-color-adjust: none;"
       >
         <defs>
@@ -264,7 +294,12 @@
           </clipPath>
         </defs>
 
-        <circle cx="200" cy="200" r="182" fill="#252b31"/>
+        <circle
+          cx="200"
+          cy="200"
+          r="182"
+          fill="#FFFFFF"
+        />
 
         <g clip-path="url(#plateClip)">
           ${dots.join("")}
@@ -305,7 +340,7 @@
 
     $("questionDescription").textContent =
       question.mode === "tap"
-        ? "Nokta plakasında diğerlerinden farklı renkte görünen alanı seç."
+        ? "Nokta plakasında farklı renkte görünen alanın üzerine dokun."
         : "Noktaların arasına gizlenmiş sayıyı bul ve aşağıya yaz.";
 
     $("plate").innerHTML = generatePlate(question);
@@ -450,6 +485,7 @@
     const total = state.answers.length;
     const correct = state.answers.filter((a) => a.correct).length;
     const wrong = total - correct;
+
     const percent = total
       ? Math.round((correct / total) * 100)
       : 0;
@@ -508,7 +544,7 @@
           labels[key],
           groupCorrect,
           group.length,
-          "Bu paletle oluşturulan sorulardaki yanıt özeti. Tek başına tanı anlamına gelmez."
+          "Bu paletle oluşturulan soruların özeti. Tek başına klinik tanı anlamına gelmez."
         );
       }).join("");
 
@@ -527,8 +563,13 @@
   }
 
   $("startBtn").addEventListener("click", startTest);
+
   $("plate").addEventListener("click", handlePlateClick);
-  $("numberForm").addEventListener("submit", handleNumberSubmit);
+
+  $("numberForm").addEventListener(
+    "submit",
+    handleNumberSubmit
+  );
 
   $("nextBtn").addEventListener("click", () => {
     if (!state.locked) return;
@@ -564,8 +605,11 @@
     event.preventDefault();
   }, { passive: false });
 
-  // PWA çevrimdışı desteği.
-  if ("serviceWorker" in navigator && location.protocol !== "file:") {
+  // Çevrimdışı PWA desteği.
+  if (
+    "serviceWorker" in navigator &&
+    location.protocol !== "file:"
+  ) {
     window.addEventListener("load", () => {
       navigator.serviceWorker.register("./sw.js")
         .catch((error) => {
