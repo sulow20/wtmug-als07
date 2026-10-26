@@ -1,6 +1,6 @@
 "use strict";
 
-const CACHE_NAME = "renk-testi-v4";
+const CACHE_NAME = "renk-testi-v5";
 
 const APP_FILES = [
   "./",
