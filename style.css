@@ -358,5 +358,58 @@ p {
   *::after {
     transition-duration: 0.01ms !important;
     animation-duration: 0.01ms !important;
+    /* Telefonun koyu tema zorlamasını engelle */
+:root {
+  color-scheme: light only !important;
+  forced-color-adjust: none;
+}
+
+html,
+body {
+  background: #f4f6fa !important;
+  color: #172033 !important;
+  color-scheme: light only !important;
+  forced-color-adjust: none;
+}
+
+.panel {
+  background: #ffffff !important;
+  color: #172033 !important;
+}
+
+.info-card,
+.metric,
+.score-card {
+  background: #edf1f7 !important;
+  color: #172033 !important;
+}
+
+.notice {
+  background: #f6f8fb !important;
+  color: #536176 !important;
+}
+
+#numberInput {
+  background: #ffffff !important;
+  color: #172033 !important;
+  color-scheme: light only !important;
+}
+
+#plate,
+.plate-frame {
+  background: #ffffff !important;
+  color-scheme: light only !important;
+  forced-color-adjust: none !important;
+}
+
+#plate svg,
+#plate svg * {
+  forced-color-adjust: none !important;
+}
+
+.primary-btn {
+  background: #087f68 !important;
+  color: #ffffff !important;
+}
   }
 }
